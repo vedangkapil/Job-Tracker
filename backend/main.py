@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.api import jobs
-from app.database import create_db_and_tables
+from backend.app.api import jobs
+from backend.app.database import create_db_and_tables
 import logging
 
 # Configure logging

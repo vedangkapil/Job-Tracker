@@ -1,8 +1,8 @@
 from typing import List, Dict, Optional
-from app.scrapers.indeed import indeed_scraper
-from app.scrapers.linkedin import linkedin_scraper
-from app.models.job import Job
-from app.database import get_session
+from backend.app.scrapers.indeed import indeed_scraper
+from backend.app.scrapers.linkedin import linkedin_scraper
+from backend.app.models.job import Job
+from backend.app.database import get_session
 from sqlmodel import Session, select
 import asyncio
 

@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, create_engine, Session
-from app.config import settings
-from app.models.job import Job  # Only import Job model
+from backend.app.config import settings
+from backend.app.models.job import Job  # Only import Job model
 
 engine = create_engine(settings.database_url, echo=True)
 

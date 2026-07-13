@@ -1,7 +1,7 @@
 import asyncio
 from typing import List, Dict, Optional
 from datetime import datetime
-from app.config import settings
+from backend.app.config import settings
 
 class LinkedInScraper:
     def __init__(self):

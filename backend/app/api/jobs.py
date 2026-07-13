@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 from typing import List, Optional
-from app.database import get_session
-from app.services.job_service import JobService
-from app.schemas.job import Job, JobCreate, JobUpdate, JobSearch
+from backend.app.database import get_session
+from backend.app.services.job_service import JobService
+from backend.app.schemas.job import Job, JobCreate, JobUpdate, JobSearch
 
 router = APIRouter()
 

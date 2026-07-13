@@ -1,8 +1,8 @@
 from typing import List, Optional
 from sqlmodel import Session, select
-from app.models.job import Job
-from app.schemas.job import JobCreate, JobUpdate
-from app.scrapers.manager import scraper_manager
+from backend.app.models.job import Job
+from backend.app.schemas.job import JobCreate, JobUpdate
+from backend.app.scrapers.manager import scraper_manager
 from datetime import datetime
 
 class JobService:

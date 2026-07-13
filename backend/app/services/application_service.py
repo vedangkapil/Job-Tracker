@@ -1,8 +1,8 @@
 from typing import List, Optional
 from sqlmodel import Session, select
-from app.models.application import Application
-from app.models.job import Job
-from app.schemas.application import ApplicationCreate, ApplicationUpdate
+from backend.app.models.application import Application
+from backend.app.models.job import Job
+from backend.app.schemas.application import ApplicationCreate, ApplicationUpdate
 from datetime import datetime
 
 class ApplicationService:

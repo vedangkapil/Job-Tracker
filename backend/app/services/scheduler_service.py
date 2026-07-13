@@ -2,9 +2,9 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from typing import List, Dict, Optional
 from sqlmodel import Session
-from app.database import get_session
-from app.scrapers.manager import scraper_manager
-from app.config import settings
+from backend.app.database import get_session
+from backend.app.scrapers.manager import scraper_manager
+from backend.app.config import settings
 import logging
 
 logger = logging.getLogger(__name__)

@@ -4,17 +4,17 @@ A comprehensive FastAPI application for scraping job listings from multiple sour
 
 ## 🚀 Features
 
-- **Multi-Source Job Scraping**: Scrape job listings from Indeed and LinkedIn using Playwright
-- **Advanced Web Scraping**: Robust scraping with error handling, rate limiting, and data extraction
-- **Job Tracking System**: Track job applications with detailed status management
-- **Scheduled Scraping**: Automatically scrape jobs at configurable intervals using APScheduler
-- **RESTful API**: Comprehensive API endpoints for all functionality
-- **SQLite Database**: Local database with SQLModel for data persistence
-- **Modern Tech Stack**: FastAPI, SQLModel, Playwright, APScheduler
+* **Multi-Source Job Scraping**: Scrape job listings from Indeed and LinkedIn using Playwright
+* **Advanced Web Scraping**: Robust scraping with error handling, rate limiting, and data extraction
+* **Job Tracking System**: Track job applications with detailed status management
+* **Scheduled Scraping**: Automatically scrape jobs at configurable intervals using APScheduler
+* **RESTful API**: Comprehensive API endpoints for all functionality
+* **SQLite Database**: Local database with SQLModel for data persistence
+* **Modern Tech Stack**: FastAPI, SQLModel, Playwright, APScheduler
 
 ## 📋 Project Structure
 
-```
+```text
 /job-tracker
 ├── .env                  # Environment variables
 ├── requirements.txt      # Project dependencies
@@ -61,40 +61,72 @@ cd job-tracker
 
 ### 2. Create Virtual Environment
 
+**Windows**
+
 ```bash
 python -m venv venv
 ```
 
+**macOS/Linux**
+
+```bash
+python3 -m venv venv
+```
+
 ### 3. Activate Virtual Environment
 
-**Windows:**
+**Windows**
+
 ```bash
 venv\Scripts\activate
 ```
 
-**macOS/Linux:**
+**macOS/Linux**
+
 ```bash
 source venv/bin/activate
 ```
 
 ### 4. Run Setup Script
 
+**Windows**
+
 ```bash
 python setup.py
 ```
 
+**macOS/Linux**
+
+```bash
+python3 setup.py
+```
+
 This will:
-- Install all Python dependencies
-- Install Playwright browsers
-- Set up the environment
+
+* Install all Python dependencies
+* Install Playwright browsers
+* Set up the environment
 
 ### 5. Manual Installation (Alternative)
 
 If you prefer manual installation:
 
+**Windows**
+
 ```bash
 # Install dependencies
 pip install -r requirements.txt
+
+# Install Playwright browsers
+playwright install
+playwright install chromium
+```
+
+**macOS/Linux**
+
+```bash
+# Install dependencies
+pip3 install -r requirements.txt
 
 # Install Playwright browsers
 playwright install
@@ -118,20 +150,30 @@ SCRAPE_DELAY_SECONDS=2
 
 ## 🚀 Running the Application
 
+**Windows**
+
 ```bash
 python main.py
 ```
 
+**macOS/Linux**
+
+```bash
+python3 main.py
+```
+
 The API will be available at:
-- **API**: http://localhost:8000
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+
+* **API**: http://localhost:8000
+* **Swagger UI**: http://localhost:8000/docs
+* **ReDoc**: http://localhost:8000/redoc
 
 ## 📚 API Usage
 
 ### Job Scraping
 
 #### Scrape Jobs from Multiple Sources
+
 ```bash
 POST /api/jobs/scrape/
 {
@@ -142,21 +184,25 @@ POST /api/jobs/scrape/
 ```
 
 #### Get All Jobs
+
 ```bash
 GET /api/jobs/?skip=0&limit=100
 ```
 
 #### Search Jobs
+
 ```bash
 GET /api/jobs/search/?keyword=python&location=remote&source=indeed
 ```
 
 #### Get Tracked Jobs
+
 ```bash
 GET /api/jobs/tracked/
 ```
 
 #### Mark Job as Tracked
+
 ```bash
 POST /api/jobs/{job_id}/track/
 ```
@@ -164,6 +210,7 @@ POST /api/jobs/{job_id}/track/
 ### Application Tracking
 
 #### Create Application
+
 ```bash
 POST /api/applications/
 {
@@ -176,16 +223,19 @@ POST /api/applications/
 ```
 
 #### Get Applications
+
 ```bash
 GET /api/applications/
 ```
 
 #### Get Applications by Status
+
 ```bash
 GET /api/applications/status/applied/
 ```
 
 #### Update Application
+
 ```bash
 PUT /api/applications/{application_id}
 {
@@ -198,6 +248,7 @@ PUT /api/applications/{application_id}
 ### Scheduled Scraping
 
 #### Add Scheduled Job
+
 ```bash
 POST /api/scheduler/jobs/
 {
@@ -209,16 +260,19 @@ POST /api/scheduler/jobs/
 ```
 
 #### Start Scheduler
+
 ```bash
 POST /api/scheduler/start/
 ```
 
 #### Get Scheduler Status
+
 ```bash
 GET /api/scheduler/status/
 ```
 
 #### Get Scheduled Jobs
+
 ```bash
 GET /api/scheduler/jobs/
 ```
@@ -226,34 +280,42 @@ GET /api/scheduler/jobs/
 ## 🎯 Example Workflow
 
 ### 1. Initial Setup
-```bash
-# Start the application
-python main.py
 
-# Open http://localhost:8000/docs in your browser
+**Windows**
+
+```bash
+python main.py
 ```
 
-### 2. Scrape Jobs
+**macOS/Linux**
+
 ```bash
-# Scrape Python developer jobs from Indeed and LinkedIn
+python3 main.py
+```
+
+Open http://localhost:8000/docs in your browser.
+
+### 2. Scrape Jobs
+
+```bash
 curl -X POST "http://localhost:8000/api/jobs/scrape/?keyword=python%20developer&location=remote"
 ```
 
 ### 3. View Scraped Jobs
+
 ```bash
-# Get all scraped jobs
 curl "http://localhost:8000/api/jobs/"
 ```
 
 ### 4. Track a Job
+
 ```bash
-# Mark a job as tracked
 curl -X POST "http://localhost:8000/api/jobs/1/track/"
 ```
 
 ### 5. Create Application
+
 ```bash
-# Create an application for a job
 curl -X POST "http://localhost:8000/api/applications/" \
   -H "Content-Type: application/json" \
   -d '{
@@ -264,8 +326,8 @@ curl -X POST "http://localhost:8000/api/applications/" \
 ```
 
 ### 6. Set Up Scheduled Scraping
+
 ```bash
-# Add a scheduled job to scrape every 6 hours
 curl -X POST "http://localhost:8000/api/scheduler/jobs/" \
   -H "Content-Type: application/json" \
   -d '{
@@ -274,68 +336,72 @@ curl -X POST "http://localhost:8000/api/scheduler/jobs/" \
     "interval_hours": 6
   }'
 
-# Start the scheduler
 curl -X POST "http://localhost:8000/api/scheduler/start/"
 ```
 
 ## 🔧 Configuration
 
 ### Scraping Settings
-- `MAX_JOBS_PER_SEARCH`: Maximum jobs to scrape per search (default: 50)
-- `SCRAPE_DELAY_SECONDS`: Delay between job extractions (default: 2)
-- `INDEED_BASE_URL`: Indeed base URL
-- `LINKEDIN_BASE_URL`: LinkedIn jobs base URL
+
+* `MAX_JOBS_PER_SEARCH`: Maximum jobs to scrape per search (default: 50)
+* `SCRAPE_DELAY_SECONDS`: Delay between job extractions (default: 2)
+* `INDEED_BASE_URL`: Indeed base URL
+* `LINKEDIN_BASE_URL`: LinkedIn jobs base URL
 
 ### Scheduler Settings
-- `SCHEDULER_ENABLED`: Enable/disable scheduler (default: true)
-- `SCRAPE_INTERVAL_HOURS`: Default interval for scheduled jobs (default: 6)
+
+* `SCHEDULER_ENABLED`: Enable/disable scheduler (default: true)
+* `SCRAPE_INTERVAL_HOURS`: Default interval for scheduled jobs (default: 6)
 
 ## 🛡️ Error Handling
 
 The application includes comprehensive error handling:
-- Network errors during scraping
-- Database connection issues
-- Invalid job/application data
-- Scheduler failures
-- Playwright browser issues
+
+* Network errors during scraping
+* Database connection issues
+* Invalid job/application data
+* Scheduler failures
+* Playwright browser issues
 
 ## 📊 Database Schema
 
 ### Jobs Table
-- `id`: Primary key
-- `title`: Job title
-- `company`: Company name
-- `location`: Job location
-- `description`: Job description
-- `salary`: Salary information
-- `job_url`: Job posting URL
-- `source`: Source (indeed, linkedin)
-- `scraped_at`: When job was scraped
-- `keywords`: Search keywords
-- `is_tracked`: Whether job is being tracked
-- `created_at`: Record creation time
-- `updated_at`: Record update time
+
+* `id`: Primary key
+* `title`: Job title
+* `company`: Company name
+* `location`: Job location
+* `description`: Job description
+* `salary`: Salary information
+* `job_url`: Job posting URL
+* `source`: Source (indeed, linkedin)
+* `scraped_at`: When job was scraped
+* `keywords`: Search keywords
+* `is_tracked`: Whether job is being tracked
+* `created_at`: Record creation time
+* `updated_at`: Record update time
 
 ### Applications Table
-- `id`: Primary key
-- `job_id`: Foreign key to jobs table
-- `status`: Application status
-- `notes`: Application notes
-- `applied_date`: When application was submitted
-- `interview_date`: Interview date
-- `follow_up_date`: Follow-up reminder date
-- `contact_person`: Contact person name
-- `contact_email`: Contact email
-- `salary_offered`: Offered salary
-- `created_at`: Record creation time
-- `updated_at`: Record update time
+
+* `id`: Primary key
+* `job_id`: Foreign key to jobs table
+* `status`: Application status
+* `notes`: Application notes
+* `applied_date`: When application was submitted
+* `interview_date`: Interview date
+* `follow_up_date`: Follow-up reminder date
+* `contact_person`: Contact person name
+* `contact_email`: Contact email
+* `salary_offered`: Offered salary
+* `created_at`: Record creation time
+* `updated_at`: Record update time
 
 ## 🚨 Important Notes
 
-- **Rate Limiting**: The scrapers include delays to respect website terms of service
-- **Browser Requirements**: Playwright requires system dependencies for browser automation
-- **Data Privacy**: All data is stored locally in SQLite database
-- **Legal Compliance**: Ensure compliance with website terms of service when scraping
+* **Rate Limiting**: The scrapers include delays to respect website terms of service
+* **Browser Requirements**: Playwright requires system dependencies for browser automation
+* **Data Privacy**: All data is stored locally in SQLite database
+* **Legal Compliance**: Ensure compliance with website terms of service when scraping
 
 ## 🤝 Contributing
 
@@ -352,6 +418,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🆘 Support
 
 For issues and questions:
+
 1. Check the API documentation at `/docs`
 2. Review the logs for error messages
 3. Ensure all dependencies are installed
@@ -359,5 +426,5 @@ For issues and questions:
 
 ## 🔄 Updates
 
-- **v2.0.0**: Enhanced with Playwright scraping, scheduling, and multi-source support
-- **v1.0.0**: Initial release with basic job tracking
+* **v2.0.0**: Enhanced with Playwright scraping, scheduling, and multi-source support
+* **v1.0.0**: Initial release with basic job tracking

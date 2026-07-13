@@ -2,6 +2,9 @@
 
 A comprehensive FastAPI application for scraping job listings from multiple sources and tracking job applications with advanced features.
 
+Repository note: the implementation is organized under the `backend/` folder. Run the FastAPI backend from `backend/main.py` (or with `uvicorn backend.main:app --reload`). If you are following Quick Start instructions, prefer the files inside `backend/` (for example `backend/QUICK_START.md`). Mobile (Android) code, if present, lives in a separate folder to keep concerns separated.
+
+
 ## 🚀 Features
 
 * **Multi-Source Job Scraping**: Scrape job listings from Indeed and LinkedIn using Playwright

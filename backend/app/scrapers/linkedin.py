@@ -1,58 +1,60 @@
 import asyncio
-from typing import List, Dict, Optional
 from datetime import datetime
+from typing import Dict, List
+
+import requests
+from bs4 import BeautifulSoup
+
 from backend.app.config import settings
 
-class LinkedInScraper:
-    def __init__(self):
-        self.base_url = settings.linkedin_base_url
-        self.max_jobs = settings.max_jobs_per_search
-        self.delay = settings.scrape_delay_seconds
-        
-    async def scrape_jobs(self, keyword: str, location: str) -> List[Dict]:
-        """Mock scraper that returns sample LinkedIn job data for demonstration."""
-        # Simulate some delay
-        await asyncio.sleep(1)
-        
-        # Return mock LinkedIn job data
-        mock_jobs = [
-            {
-                "title": f"{keyword.title()} Specialist",
-                "company": "LinkedIn Tech",
-                "location": location,
-                "description": f"Join our team as a {keyword} specialist. We offer competitive benefits and a great work environment.",
-                "salary": None,  # LinkedIn doesn't always show salary
-                "job_url": f"https://linkedin.com/jobs/view/123456_{keyword}",
-                "source": "linkedin",
-                "scraped_at": datetime.utcnow(),
-                "keywords": f"{keyword},{location}"
-            },
-            {
-                "title": f"Senior {keyword.title()} Manager",
-                "company": "Enterprise Solutions",
-                "location": location,
-                "description": f"Manage a team of {keyword} professionals. Leadership experience required.",
-                "salary": None,
-                "job_url": f"https://linkedin.com/jobs/view/789012_{keyword}",
-                "source": "linkedin",
-                "scraped_at": datetime.utcnow(),
-                "keywords": f"{keyword},{location}"
-            },
-            {
-                "title": f"{keyword.title()} Consultant",
-                "company": "Consulting Partners",
-                "location": location,
-                "description": f"Work with clients as a {keyword} consultant. Travel opportunities available.",
-                "salary": None,
-                "job_url": f"https://linkedin.com/jobs/view/345678_{keyword}",
-                "source": "linkedin",
-                "scraped_at": datetime.utcnow(),
-                "keywords": f"{keyword},{location}"
-            }
-        ]
-        
-        print(f"Mock LinkedIn scraping: Found {len(mock_jobs)} jobs for '{keyword}' in '{location}'")
-        return mock_jobs
 
-# Create a global instance
-linkedin_scraper = LinkedInScraper() 
+class LinkedInScraper:
+    """Fetch public LinkedIn job cards for the requested query and location."""
+
+    def __init__(self):
+        self.base_url = settings.linkedin_base_url.rstrip("/")
+        self.max_jobs = settings.max_jobs_per_search
+
+    async def scrape_jobs(self, keyword: str, location: str) -> List[Dict]:
+        return await asyncio.to_thread(self._scrape_jobs, keyword, location)
+
+    def _scrape_jobs(self, keyword: str, location: str) -> List[Dict]:
+        response = requests.get(
+            f"{self.base_url}/search",
+            params={"keywords": keyword.strip(), "location": location.strip()},
+            headers={"User-Agent": "Mozilla/5.0 (compatible; JobTracker/1.0)"},
+            timeout=15,
+        )
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        jobs: List[Dict] = []
+
+        # LinkedIn currently uses a div for each public job card.  Keep the
+        # list-item selector too, since it is used by older page variants.
+        for card in soup.select("div.base-card, li.base-card"):
+            title_node = card.select_one("h3.base-search-card__title")
+            company_node = card.select_one("h4.base-search-card__subtitle")
+            location_node = card.select_one("span.job-search-card__location")
+            link_node = card.select_one("a.base-card__full-link")
+            if not (title_node and company_node and link_node):
+                continue
+            href = link_node.get("href", "").split("?")[0]
+            if not href:
+                continue
+            jobs.append({
+                "title": title_node.get_text(" ", strip=True),
+                "company": company_node.get_text(" ", strip=True),
+                "location": location_node.get_text(" ", strip=True) if location_node else location,
+                "description": "Description available on the LinkedIn job posting.",
+                "salary": None,
+                "job_url": href,
+                "source": "linkedin",
+                "scraped_at": datetime.utcnow(),
+                "keywords": f"{keyword},{location}",
+            })
+            if len(jobs) >= self.max_jobs:
+                break
+        return jobs
+
+
+linkedin_scraper = LinkedInScraper()

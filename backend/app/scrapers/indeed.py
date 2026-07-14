@@ -1,80 +1,63 @@
 import asyncio
-from typing import List, Dict, Optional
 from datetime import datetime
+from typing import Dict, List
+from urllib.parse import urlencode
+
+import requests
+from bs4 import BeautifulSoup
+
 from backend.app.config import settings
 
-class IndeedScraper:
-    def __init__(self):
-        self.base_url = settings.indeed_base_url
-        self.max_jobs = settings.max_jobs_per_search
-        self.delay = settings.scrape_delay_seconds
-        
-    async def scrape_jobs(self, keyword: str, location: str) -> List[Dict]:
-        """Mock scraper that returns sample job data for demonstration."""
-        # Simulate some delay
-        await asyncio.sleep(1)
-        
-        # Return mock job data
-        mock_jobs = [
-            {
-                "title": f"Senior {keyword.title()}",
-                "company": "Tech Solutions Inc.",
-                "location": location,
-                "description": f"Exciting opportunity for a senior {keyword} to join our growing team. We're looking for someone with 3+ years of experience.",
-                "salary": "$80,000 - $120,000",
-                "job_url": f"https://indeed.com/viewjob?jk=123456_{keyword}",
-                "source": "indeed",
-                "scraped_at": datetime.utcnow(),
-                "keywords": f"{keyword},{location}"
-            },
-            {
-                "title": f"Junior {keyword.title()} Developer",
-                "company": "StartUp Co",
-                "location": location,
-                "description": f"Great opportunity for a junior {keyword} developer to grow their skills in a fast-paced environment.",
-                "salary": "$60,000 - $80,000",
-                "job_url": f"https://indeed.com/viewjob?jk=789012_{keyword}",
-                "source": "indeed",
-                "scraped_at": datetime.utcnow(),
-                "keywords": f"{keyword},{location}"
-            },
-            {
-                "title": f"{keyword.title()} Engineer",
-                "company": "Big Tech Corp",
-                "location": location,
-                "description": f"We're hiring a {keyword} engineer to work on cutting-edge projects. Remote work available.",
-                "salary": "$90,000 - $130,000",
-                "job_url": f"https://indeed.com/viewjob?jk=345678_{keyword}",
-                "source": "indeed",
-                "scraped_at": datetime.utcnow(),
-                "keywords": f"{keyword},{location}"
-            },
-            {
-                "title": f"Lead {keyword.title()}",
-                "company": "Innovation Labs",
-                "location": location,
-                "description": f"Lead {keyword} position with team management responsibilities. Great benefits and growth opportunities.",
-                "salary": "$100,000 - $150,000",
-                "job_url": f"https://indeed.com/viewjob?jk=901234_{keyword}",
-                "source": "indeed",
-                "scraped_at": datetime.utcnow(),
-                "keywords": f"{keyword},{location}"
-            },
-            {
-                "title": f"Full Stack {keyword.title()}",
-                "company": "Digital Agency",
-                "location": location,
-                "description": f"Full stack {keyword} developer needed for client projects. Experience with modern frameworks required.",
-                "salary": "$70,000 - $100,000",
-                "job_url": f"https://indeed.com/viewjob?jk=567890_{keyword}",
-                "source": "indeed",
-                "scraped_at": datetime.utcnow(),
-                "keywords": f"{keyword},{location}"
-            }
-        ]
-        
-        print(f"Mock scraping: Found {len(mock_jobs)} jobs for '{keyword}' in '{location}'")
-        return mock_jobs
 
-# Create a global instance
+class IndeedScraper:
+    """Fetch the public Indeed search page for the requested query."""
+
+    def __init__(self):
+        self.base_url = settings.indeed_base_url.rstrip("/")
+        self.max_jobs = settings.max_jobs_per_search
+
+    async def scrape_jobs(self, keyword: str, location: str) -> List[Dict]:
+        return await asyncio.to_thread(self._scrape_jobs, keyword, location)
+
+    def _scrape_jobs(self, keyword: str, location: str) -> List[Dict]:
+        query = urlencode({"q": keyword.strip(), "l": location.strip()})
+        response = requests.get(
+            f"{self.base_url}/jobs?{query}",
+            headers={"User-Agent": "Mozilla/5.0 (compatible; JobTracker/1.0)"},
+            timeout=15,
+        )
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        jobs: List[Dict] = []
+
+        for card in soup.select("div.job_seen_beacon, div.cardOutline"):
+            title_node = card.select_one("h2.jobTitle span, h2.jobTitle a, a.jcs-JobTitle")
+            company_node = card.select_one("[data-testid='company-name'], span.companyName")
+            location_node = card.select_one("[data-testid='text-location'], div.companyLocation")
+            link_node = card.select_one("a.jcs-JobTitle, h2.jobTitle a")
+            if not (title_node and company_node and link_node):
+                continue
+
+            href = link_node.get("href", "")
+            if href.startswith("/"):
+                href = f"{self.base_url}{href}"
+            if not href:
+                continue
+            description_node = card.select_one(".job-snippet, [data-testid='job-snippet']")
+            jobs.append({
+                "title": title_node.get_text(" ", strip=True),
+                "company": company_node.get_text(" ", strip=True),
+                "location": location_node.get_text(" ", strip=True) if location_node else location,
+                "description": description_node.get_text(" ", strip=True) if description_node else "",
+                "salary": None,
+                "job_url": href,
+                "source": "indeed",
+                "scraped_at": datetime.utcnow(),
+                "keywords": f"{keyword},{location}",
+            })
+            if len(jobs) >= self.max_jobs:
+                break
+        return jobs
+
+
 indeed_scraper = IndeedScraper()

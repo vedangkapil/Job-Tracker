@@ -16,7 +16,6 @@ class JobService:
     def get_job(self, job_id: int) -> Optional[Job]:
         """Get a specific job by ID."""
         return self.session.get(Job, job_id)
-    
     def create_job(self, job: JobCreate) -> Job:
         """Create a new job manually."""
         db_job = Job(**job.dict())
@@ -103,4 +102,4 @@ class JobService:
     
     async def scrape_and_save_jobs(self, keyword: str, location: str, sources: List[str] = None) -> List[Job]:
         """Scrape jobs and save them to the database."""
-        return await scraper_manager.scrape_and_save_jobs(keyword, location, sources)
+        return await scraper_manager.scrape_and_save_jobs(keyword, location, sources, self.session)

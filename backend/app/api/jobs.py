@@ -19,7 +19,7 @@ async def scrape_jobs(
     try:
         jobs = await job_service.scrape_and_save_jobs(keyword, location, sources)
         return {
-            "message": f"Successfully scraped {len(jobs)} jobs",
+            "message": f"Found and saved {len(jobs)} jobs",
             "jobs": [job.dict() for job in jobs],
             "keyword": keyword,
             "location": location,

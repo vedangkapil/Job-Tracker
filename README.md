@@ -40,7 +40,6 @@ The screens below appear in the same order as the app flow captured in the suppl
 
 | Screen | Purpose |
 | --- | --- |
-| Splash | Displays the CareerFlow logo while the app starts. |
 | Login | A simple local demo sign-in screen. |
 | Home | Shows results from the latest job search. |
 | Find jobs | Searches openings by role and location. |
@@ -126,6 +125,3 @@ MAX_JOBS_PER_SEARCH=50
 - Public job sites can change their page structure or limit automated requests. A search may occasionally return no results.
 - SQLite data is stored locally and is not shared externally.
 
-## License
-
-This project is licensed under the MIT License.

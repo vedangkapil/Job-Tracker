@@ -1,6 +1,7 @@
 package com.Vedang.careerflow.data.api
 
 import com.Vedang.careerflow.data.dto.ActionResponseDto
+import com.Vedang.careerflow.data.dto.ApplicationDto
 import com.Vedang.careerflow.data.dto.BackendStatusDto
 import com.Vedang.careerflow.data.dto.JobDto
 import com.Vedang.careerflow.data.dto.JobSearchResponseDto
@@ -15,6 +16,9 @@ interface JobsApiService {
 
     @GET("/")
     suspend fun getBackendStatus(): BackendStatusDto
+
+    @GET("applications")
+    suspend fun getApplications(): List<ApplicationDto>
 
     @GET("api/jobs/")
     suspend fun getJobs(

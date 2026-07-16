@@ -3,7 +3,9 @@ package com.Vedang.careerflow.data.repository
 import com.Vedang.careerflow.data.api.JobsApiService
 import com.Vedang.careerflow.data.api.RetrofitClient
 import com.Vedang.careerflow.data.dto.toJob
+import com.Vedang.careerflow.data.dto.toJobApplication
 import com.Vedang.careerflow.model.Job
+import com.Vedang.careerflow.model.JobApplication
 import com.Vedang.careerflow.model.JobSearchResult
 import com.Vedang.careerflow.model.ScrapeJobsResult
 import com.Vedang.careerflow.model.TrackingStatus
@@ -17,6 +19,10 @@ import java.io.IOException
 class JobRepository(
     private val api: JobsApiService = RetrofitClient.jobsApi
 ) {
+    suspend fun getApplications(): AppResult<List<JobApplication>> = safeApiCall {
+        api.getApplications().map { it.toJobApplication() }
+    }
+
     suspend fun getJobs(skip: Int = 0, limit: Int = 100): AppResult<List<Job>> = safeApiCall {
         api.getJobs(skip, limit).map { it.toJob() }
     }

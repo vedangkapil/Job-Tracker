@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.app.api import jobs
+from backend.app.api import applications, jobs
 from backend.app.database import create_db_and_tables
 import logging
 
@@ -20,6 +20,7 @@ app = FastAPI(
 
 # Include only jobs router
 app.include_router(jobs.router, prefix="/api/jobs", tags=["jobs"])
+app.include_router(applications.router, prefix="/applications", tags=["applications"])
 
 @app.get("/")
 async def root():

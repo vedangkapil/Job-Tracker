@@ -42,6 +42,8 @@ fun HomeScreen(
     onRefresh: () -> Unit,
     onFindJobs: () -> Unit,
     onSavedJobs: () -> Unit,
+    onApplications: () -> Unit,
+    onProfile: () -> Unit,
     onJobClick: (Int) -> Unit
 ) {
     Scaffold(
@@ -51,6 +53,7 @@ fun HomeScreen(
                     BrandLockup()
                 },
                 actions = {
+                    TextButton(onClick = onProfile) { Text("Profile") }
                     OutlinedButton(onClick = onSavedJobs) {
                         Text("Saved jobs")
                     }
@@ -74,6 +77,8 @@ fun HomeScreen(
                 description = "Find a role to discover opportunities and keep your favourites close.",
                 actionLabel = "Find jobs",
                 onAction = onFindJobs,
+                secondaryActionLabel = "View application tracker",
+                onSecondaryAction = onApplications,
                 modifier = Modifier.padding(innerPadding)
             )
 
@@ -82,6 +87,7 @@ fun HomeScreen(
                 contentPadding = innerPadding,
                 onRefresh = onRefresh,
                 onFindJobs = onFindJobs,
+                onApplications = onApplications,
                 onJobClick = onJobClick
             )
         }
@@ -94,6 +100,7 @@ private fun JobList(
     contentPadding: PaddingValues,
     onRefresh: () -> Unit,
     onFindJobs: () -> Unit,
+    onApplications: () -> Unit,
     onJobClick: (Int) -> Unit
 ) {
     LazyColumn(
@@ -108,6 +115,11 @@ private fun JobList(
     ) {
         item {
             OpportunityHero(onFindJobs = onFindJobs)
+        }
+        item {
+            OutlinedButton(onClick = onApplications, modifier = Modifier.fillMaxWidth()) {
+                Text("View application tracker")
+            }
         }
         item {
             Column {

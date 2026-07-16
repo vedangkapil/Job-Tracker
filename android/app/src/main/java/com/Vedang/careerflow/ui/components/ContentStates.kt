@@ -124,6 +124,8 @@ fun EmptyContent(
     description: String,
     actionLabel: String,
     onAction: () -> Unit,
+    secondaryActionLabel: String? = null,
+    onSecondaryAction: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -147,6 +149,12 @@ fun EmptyContent(
         )
         Button(onClick = onAction, modifier = Modifier.padding(top = 20.dp)) {
             Text(actionLabel)
+        }
+        if (secondaryActionLabel != null && onSecondaryAction != null) {
+            androidx.compose.material3.OutlinedButton(
+                onClick = onSecondaryAction,
+                modifier = Modifier.padding(top = 8.dp)
+            ) { Text(secondaryActionLabel) }
         }
     }
 }

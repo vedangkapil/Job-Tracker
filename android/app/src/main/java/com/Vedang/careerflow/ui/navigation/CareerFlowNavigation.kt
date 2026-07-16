@@ -12,6 +12,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,9 +27,14 @@ import androidx.navigation.navArgument
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.Vedang.careerflow.ui.screens.HomeScreen
+import com.Vedang.careerflow.ui.screens.ApplicationTrackerScreen
 import com.Vedang.careerflow.ui.screens.JobDetailScreen
+import com.Vedang.careerflow.ui.screens.LoginScreen
+import com.Vedang.careerflow.ui.screens.ProfileScreen
 import com.Vedang.careerflow.ui.screens.SearchScreen
 import com.Vedang.careerflow.ui.screens.SavedJobsScreen
+import com.Vedang.careerflow.ui.screens.SplashScreen
+import com.Vedang.careerflow.viewmodel.ApplicationTrackerViewModel
 import com.Vedang.careerflow.viewmodel.HomeViewModel
 import com.Vedang.careerflow.viewmodel.JobDetailViewModel
 import com.Vedang.careerflow.viewmodel.SearchViewModel
@@ -35,6 +44,8 @@ sealed class CareerFlowDestination(val route: String) {
     data object Home : CareerFlowDestination("home")
     data object Search : CareerFlowDestination("search")
     data object SavedJobs : CareerFlowDestination("saved_jobs")
+    data object Applications : CareerFlowDestination("applications")
+    data object Profile : CareerFlowDestination("profile")
 
     data object JobDetail : CareerFlowDestination("job/{jobId}") {
         fun createRoute(jobId: Int) = "job/$jobId"
@@ -43,6 +54,28 @@ sealed class CareerFlowDestination(val route: String) {
 
 @Composable
 fun CareerFlowApp() {
+    var splashVisible by remember { mutableStateOf(true) }
+    var profileName by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(splashVisible) {
+        if (splashVisible) {
+            kotlinx.coroutines.delay(1200)
+            splashVisible = false
+        }
+    }
+
+    when {
+        splashVisible -> SplashScreen()
+        profileName == null -> LoginScreen(onContinue = { profileName = it })
+        else -> AuthenticatedCareerFlowApp(
+            profileName = profileName.orEmpty(),
+            onSignOut = { profileName = null }
+        )
+    }
+}
+
+@Composable
+private fun AuthenticatedCareerFlowApp(profileName: String, onSignOut: () -> Unit) {
     val navController = rememberNavController()
 
     NavHost(
@@ -53,6 +86,8 @@ fun CareerFlowApp() {
             HomeRoute(
                 onFindJobs = { navController.navigate(CareerFlowDestination.Search.route) },
                 onSavedJobs = { navController.navigate(CareerFlowDestination.SavedJobs.route) },
+                onApplications = { navController.navigate(CareerFlowDestination.Applications.route) },
+                onProfile = { navController.navigate(CareerFlowDestination.Profile.route) },
                 onJobClick = { jobId ->
                     navController.navigate(CareerFlowDestination.JobDetail.createRoute(jobId))
                 }
@@ -78,6 +113,18 @@ fun CareerFlowApp() {
             )
         }
 
+        composable(CareerFlowDestination.Applications.route) {
+            ApplicationsRoute(onBack = { navController.popBackStack() })
+        }
+
+        composable(CareerFlowDestination.Profile.route) {
+            ProfileScreen(
+                name = profileName,
+                onBack = { navController.popBackStack() },
+                onSignOut = onSignOut
+            )
+        }
+
         composable(
             route = CareerFlowDestination.JobDetail.route,
             arguments = listOf(navArgument("jobId") { type = NavType.IntType })
@@ -95,6 +142,8 @@ fun CareerFlowApp() {
 private fun HomeRoute(
     onFindJobs: () -> Unit,
     onSavedJobs: () -> Unit,
+    onApplications: () -> Unit,
+    onProfile: () -> Unit,
     onJobClick: (Int) -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
@@ -109,7 +158,23 @@ private fun HomeRoute(
         onRefresh = viewModel::loadJobs,
         onFindJobs = onFindJobs,
         onSavedJobs = onSavedJobs,
+        onApplications = onApplications,
+        onProfile = onProfile,
         onJobClick = onJobClick
+    )
+}
+
+@Composable
+private fun ApplicationsRoute(
+    onBack: () -> Unit,
+    viewModel: ApplicationTrackerViewModel = viewModel()
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) { viewModel.loadApplications() }
+    ApplicationTrackerScreen(
+        uiState = uiState.value,
+        onRefresh = viewModel::loadApplications,
+        onBack = onBack
     )
 }
 

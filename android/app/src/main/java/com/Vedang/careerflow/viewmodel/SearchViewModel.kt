@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 data class SearchUiState(
     val keyword: String = "",
     val location: String = "",
+    val searchedKeyword: String? = null,
+    val searchedLocation: String? = null,
     val isLoading: Boolean = false,
     val jobs: List<Job> = emptyList(),
     val message: String? = null,
@@ -27,11 +29,29 @@ class SearchViewModel(
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     fun updateKeyword(keyword: String) {
-        _uiState.update { it.copy(keyword = keyword, errorMessage = null) }
+        _uiState.update {
+            it.copy(
+                keyword = keyword,
+                jobs = emptyList(),
+                message = null,
+                errorMessage = null,
+                searchedKeyword = null,
+                searchedLocation = null
+            )
+        }
     }
 
     fun updateLocation(location: String) {
-        _uiState.update { it.copy(location = location, errorMessage = null) }
+        _uiState.update {
+            it.copy(
+                location = location,
+                jobs = emptyList(),
+                message = null,
+                errorMessage = null,
+                searchedKeyword = null,
+                searchedLocation = null
+            )
+        }
     }
 
     fun findNewJobs() {
@@ -53,7 +73,9 @@ class SearchViewModel(
                     it.copy(
                         isLoading = false,
                         jobs = result.data.jobs,
-                        message = result.data.message
+                        message = result.data.message,
+                        searchedKeyword = result.data.keyword,
+                        searchedLocation = result.data.location
                     )
                 }
 

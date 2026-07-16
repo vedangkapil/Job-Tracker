@@ -1,17 +1,18 @@
 package com.Vedang.careerflow.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -32,18 +33,10 @@ fun SavedJobsScreen(
 ) {
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Saved jobs") },
-                navigationIcon = {
-                    TextButton(onClick = onBack) {
-                        Text("Back")
-                    }
-                },
-                actions = {
-                    TextButton(onClick = onRefresh) {
-                        Text("Refresh")
-                    }
-                }
+            TopAppBar(
+                title = { Text("Saved jobs", style = MaterialTheme.typography.titleLarge) },
+                navigationIcon = { TextButton(onClick = onBack) { Text("Back") } },
+                actions = { TextButton(onClick = onRefresh) { Text("Refresh") } }
             )
         }
     ) { innerPadding ->
@@ -59,9 +52,9 @@ fun SavedJobsScreen(
             )
 
             uiState.jobs.isEmpty() -> EmptyContent(
-                title = "No saved jobs yet",
-                description = "Save roles you want to revisit, and they’ll stay together here.",
-                actionLabel = "Find jobs",
+                title = "Your shortlist is empty",
+                description = "Save promising roles and they’ll be ready here when you are.",
+                actionLabel = "Explore jobs",
                 onAction = onFindJobs,
                 modifier = Modifier.padding(innerPadding)
             )
@@ -85,25 +78,29 @@ private fun SavedJobList(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             start = 20.dp,
-            top = contentPadding.calculateTopPadding() + 12.dp,
+            top = contentPadding.calculateTopPadding() + 8.dp,
             end = 20.dp,
-            bottom = contentPadding.calculateBottomPadding() + 20.dp
+            bottom = contentPadding.calculateBottomPadding() + 24.dp
         ),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         item {
-            Text("Roles you’re tracking", style = MaterialTheme.typography.headlineMedium)
-            Text(
-                text = "Keep the best opportunities in one place.",
-                modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
-                style = MaterialTheme.typography.bodyLarge
-            )
-            uiState.errorMessage?.let { message ->
+            Column {
+                Text("Your shortlist", style = MaterialTheme.typography.headlineMedium)
                 Text(
-                    text = message,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
+                    text = "${uiState.jobs.size} roles worth coming back to.",
+                    modifier = Modifier.padding(top = 6.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                uiState.errorMessage?.let { message ->
+                    Text(
+                        text = message,
+                        modifier = Modifier.padding(top = 10.dp),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
         items(uiState.jobs, key = { it.id }) { job ->

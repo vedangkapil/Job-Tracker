@@ -10,15 +10,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
@@ -39,15 +41,12 @@ fun SearchScreen(
     onJobClick: (Int) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Find jobs") },
+            TopAppBar(
+                title = { Text("Find jobs", style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
-                    TextButton(onClick = onBack) {
-                        Text("Back")
-                    }
+                    TextButton(onClick = onBack) { Text("Back") }
                 }
             )
         }
@@ -78,89 +77,122 @@ private fun SearchContent(
         focusManager.clearFocus()
         onFindJobs()
     }
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             start = 20.dp,
-            top = contentPadding.calculateTopPadding() + 12.dp,
+            top = contentPadding.calculateTopPadding() + 8.dp,
             end = 20.dp,
-            bottom = contentPadding.calculateBottomPadding() + 20.dp
+            bottom = contentPadding.calculateBottomPadding() + 24.dp
         ),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         item {
-            Column {
-                Text("Discover your next role", style = MaterialTheme.typography.headlineMedium)
-                Text(
-                    text = "Searches currently use LinkedIn and save the results to your job list.",
-                    modifier = Modifier.padding(top = 4.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                OutlinedTextField(
-                    value = uiState.keyword,
-                    onValueChange = onKeywordChanged,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp),
-                    label = { Text("Job title or skill") },
-                    placeholder = { Text("e.g. Android developer") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-                )
-                OutlinedTextField(
-                    value = uiState.location,
-                    onValueChange = onLocationChanged,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp),
-                    label = { Text("Location") },
-                    placeholder = { Text("e.g. Pune") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { submitSearch() })
-                )
-                Button(
-                    onClick = submitSearch,
-                    enabled = !uiState.isLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                ) {
-                    Text(if (uiState.isLoading) "Searching…" else "Find jobs")
-                }
-                if (uiState.isLoading) {
-                    LinearProgressIndicator(
+            Text("Find your next role", style = MaterialTheme.typography.headlineMedium)
+            Text(
+                text = "Tell us what you’re looking for and we’ll bring fresh roles to you.",
+                modifier = Modifier.padding(top = 6.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        item {
+            Surface(
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surfaceContainerLow
+            ) {
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Text("Your search", style = MaterialTheme.typography.titleLarge)
+                    AssistChip(
+                        onClick = {},
+                        label = { Text("LinkedIn results") },
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
+                    OutlinedTextField(
+                        value = uiState.keyword,
+                        onValueChange = onKeywordChanged,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 18.dp),
+                        label = { Text("Role or skill") },
+                        placeholder = { Text("Android developer") },
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.medium,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                    )
+                    OutlinedTextField(
+                        value = uiState.location,
+                        onValueChange = onLocationChanged,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp),
+                        label = { Text("Location") },
+                        placeholder = { Text("Pune") },
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.medium,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch = { submitSearch() })
+                    )
+                    Button(
+                        onClick = submitSearch,
+                        enabled = !uiState.isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 16.dp)
-                    )
+                    ) {
+                        Text(if (uiState.isLoading) "Searching…" else "Search opportunities")
+                    }
+                    if (uiState.isLoading) {
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 14.dp),
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                    uiState.errorMessage?.let { message ->
+                        Text(
+                            text = message,
+                            modifier = Modifier.padding(top = 12.dp),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
-                uiState.errorMessage?.let { message ->
-                    Text(
-                        text = message,
-                        modifier = Modifier.padding(top = 12.dp),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-                uiState.message?.let { message ->
-                    Text(
-                        text = message,
-                        modifier = Modifier.padding(top = 12.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+            }
+        }
+        uiState.message?.let { message ->
+            item {
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
             }
         }
         if (!uiState.isLoading && uiState.message != null && uiState.jobs.isEmpty()) {
             item {
                 Text(
-                    text = "No matching roles were found. Try another search.",
-                    modifier = Modifier.padding(vertical = 20.dp),
-                    style = MaterialTheme.typography.bodyLarge
+                    text = "No matching roles yet. Try a broader title or a nearby location.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+        }
+        if (uiState.jobs.isNotEmpty()) {
+            item {
+                Text(
+                    text = "${uiState.searchedKeyword ?: "Search"} roles",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                uiState.searchedLocation?.let { location ->
+                    Text(
+                        text = "in $location",
+                        modifier = Modifier.padding(top = 4.dp),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
         items(uiState.jobs, key = { it.id }) { job ->

@@ -1,154 +1,131 @@
-# Job Tracker
+# CareerFlow
 
-A FastAPI-based job scraping and tracking project with a backend that collects job listings from multiple sources and stores them locally in a SQLite database.
+CareerFlow is a full-stack job-search companion: an Android app for discovering roles, saving a shortlist, and following applications, backed by a FastAPI service that searches public job listings and stores the results locally.
 
-The implementation is currently organized under the backend folder. The Android folder is present as a separate workspace for future mobile development.
+## Screenshots
 
-## Features
+The screens below appear in the same order as the app flow captured in the supplied screenshots.
 
-- Scrape job listings from Indeed and LinkedIn
-- Store scraped jobs in a local SQLite database
-- Search jobs by keyword, location, or source
-- Mark jobs as tracked or untracked
-- Expose the backend through a FastAPI API
+| Home | Find jobs |
+| --- | --- |
+| <img src="docs/images/01-home.png" alt="CareerFlow home screen" width="280" /> | <img src="docs/images/02-search.png" alt="Find jobs search form" width="280" /> |
+| Search results | Job details |
+| <img src="docs/images/03-search-results.png" alt="Android Developer search results" width="280" /> | <img src="docs/images/04-job-details.png" alt="Job details and save controls" width="280" /> |
+| Apply on LinkedIn | Saved jobs |
+| <img src="docs/images/05-apply-on-linkedin.png" alt="LinkedIn job application page" width="280" /> | <img src="docs/images/06-saved-jobs.png" alt="Saved jobs shortlist" width="280" /> |
+| Profile | Login |
+| <img src="docs/images/07-profile.png" alt="CareerFlow profile screen" width="280" /> | <img src="docs/images/08-login.png" alt="CareerFlow demo login screen" width="280" /> |
 
-## Current Project Structure
+## What it includes
+
+### Android app
+
+- Animated splash screen with CareerFlow branding
+- Local demo login — no account or authentication server required
+- Job search by role and location
+- Latest-search Home feed, so previous searches do not mix with new results
+- Job details with an apply link and a saved-jobs shortlist
+- Application Tracker for Applied, Interview, Rejected, and Offer stages
+- Basic local profile with sign out
+- Responsive Compose UI with clear buttons, accessible back navigation, loading, empty, and error states
+
+### FastAPI backend
+
+- Searches public LinkedIn and Indeed listings for the submitted role and location
+- Stores discovered jobs, saved jobs, and application records in SQLite
+- Removes old unsaved results on a new search while retaining saved jobs
+- Provides REST endpoints for job discovery, tracking, and application tracking
+
+## Screens
+
+| Screen | Purpose |
+| --- | --- |
+| Splash | Displays the CareerFlow logo while the app starts. |
+| Login | A simple local demo sign-in screen. |
+| Home | Shows results from the latest job search. |
+| Find jobs | Searches openings by role and location. |
+| Saved jobs | Keeps the user's shortlisted roles. |
+| Application Tracker | Summarises Applied, Interview, Rejected, and Offer applications. |
+| Profile | Displays the local demo profile and sign-out action. |
+
+## Project structure
 
 ```text
 Job-Tracker/
-├── README.md
-├── android/                  # Android project folder (currently empty placeholder)
-├── backend/
-│   ├── QUICK_START.md
-│   ├── main.py               # FastAPI app entry point
-│   ├── requirements.txt
-│   ├── setup.py
-│   ├── test_app.py
+├── android/                    # Android / Jetpack Compose app
+│   └── app/src/main/java/.../
+│       ├── data/               # Retrofit API client and repository
+│       ├── model/              # App models
+│       ├── ui/                 # Screens, components, navigation, theme
+│       └── viewmodel/          # Screen state and UI logic
+├── backend/                    # FastAPI service
+│   ├── main.py                 # API entry point
 │   └── app/
-│       ├── __init__.py
-│       ├── config.py
-│       ├── database.py
-│       ├── models/
-│       │   ├── __init__.py
-│       │   └── job.py
-│       ├── schemas/
-│       │   ├── __init__.py
-│       │   └── job.py
-│       ├── scrapers/
-│       │   ├── __init__.py
-│       │   ├── indeed.py
-│       │   ├── linkedin.py
-│       │   └── manager.py
-│       ├── api/
-│       │   ├── __init__.py
-│       │   └── jobs.py
-│       └── services/
-│           ├── __init__.py
-│           ├── job_service.py
-│           └── scheduler_service.py
+│       ├── api/                # Job and application endpoints
+│       ├── models/             # SQLModel tables
+│       ├── scrapers/           # LinkedIn and Indeed search clients
+│       └── services/           # Job and application logic
+├── docs/images/                # README screenshots
+└── README.md
 ```
 
-## Setup
+## Run locally
 
-### 1. Create and activate a virtual environment
+### Prerequisites
 
-macOS/Linux:
+- Python 3.10+
+- Android Studio with an Android emulator (or a physical Android device)
+- Java is provided by Android Studio for Android builds
 
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-Windows:
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-### 2. Install dependencies
-
-```bash
-pip install -r backend/requirements.txt
-```
-
-### 3. Run the backend
+### 1. Start the backend
 
 From the project root:
 
 ```bash
-cd backend
-uvicorn main:app --reload
+python3 -m venv venv
+source venv/bin/activate
+pip install -r backend/requirements.txt
+python -m uvicorn backend.main:app --reload
 ```
 
-The API will be available at:
+The API is available at [http://localhost:8000/docs](http://localhost:8000/docs).
 
-- http://localhost:8000/docs
-- http://localhost:8000/redoc
+### 2. Run the Android app
 
-## Backend API Overview
+1. Open the `android` folder in Android Studio.
+2. Start an Android emulator.
+3. Run the `app` configuration.
 
-The current backend exposes these main job-related routes:
+The emulator uses `http://10.0.2.2:8000/` to reach the backend running on the development computer. For a physical phone, update `BASE_URL` in [`RetrofitClient.kt`](android/app/src/main/java/com/Vedang/careerflow/data/api/RetrofitClient.kt) to the computer's local-network IP address.
 
-- POST /api/jobs/scrape/ - scrape jobs from selected sources
-- GET /api/jobs/ - list jobs with pagination
-- GET /api/jobs/search/ - search jobs by keyword, location, or source
-- GET /api/jobs/tracked/ - list tracked jobs
-- GET /api/jobs/untracked/ - list untracked jobs
-- POST /api/jobs/{job_id}/track/ - mark a job as tracked
-- POST /api/jobs/{job_id}/untrack/ - mark a job as untracked
-- POST /api/jobs/{job_id}/toggle/ - toggle tracking state
+## API overview
 
-## Environment Variables
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/api/jobs/scrape/` | Searches and saves jobs for a role and location. |
+| `GET` | `/api/jobs/` | Lists stored jobs. |
+| `GET` | `/api/jobs/search/` | Filters jobs by keyword, location, or source. |
+| `GET` | `/api/jobs/tracked/` | Lists saved jobs. |
+| `POST` | `/api/jobs/{jobId}/toggle/` | Saves or removes a job from the shortlist. |
+| `GET` | `/applications` | Lists application records for the Application Tracker. |
 
-You can optionally create a .env file in the backend folder with values such as:
+## Configuration
+
+Optionally create a `.env` file in the project root:
 
 ```env
 DATABASE_URL=sqlite:///./job_tracker.db
-SECRET_KEY=your-secret-key-here
 INDEED_BASE_URL=https://www.indeed.com
 LINKEDIN_BASE_URL=https://www.linkedin.com/jobs
-SCHEDULER_ENABLED=true
-SCRAPE_INTERVAL_HOURS=6
 MAX_JOBS_PER_SEARCH=50
-SCRAPE_DELAY_SECONDS=2
 ```
 
 ## Notes
 
-- The backend is the main working part of the project right now.
-- The Android folder is reserved for future mobile app development.
-- For more detailed usage instructions, see [backend/QUICK_START.md](backend/QUICK_START.md).
+- The login and profile are intentionally local-only placeholders; no credentials are sent to the backend.
+- Public job sites can change their page structure or limit automated requests. A search may occasionally return no results.
+- SQLite data is stored locally and is not shared externally.
 
-## 🚨 Important Notes
+## License
 
-* **Rate Limiting**: The scrapers include delays to respect website terms of service
-* **Browser Requirements**: Playwright requires system dependencies for browser automation
-* **Data Privacy**: All data is stored locally in SQLite database
-* **Legal Compliance**: Ensure compliance with website terms of service when scraping
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🆘 Support
-
-For issues and questions:
-
-1. Check the API documentation at `/docs`
-2. Review the logs for error messages
-3. Ensure all dependencies are installed
-4. Verify Playwright browsers are installed
-
-## 🔄 Updates
-
-* **v2.0.0**: Enhanced with Playwright scraping, scheduling, and multi-source support
-* **v1.0.0**: Initial release with basic job tracking
+This project is licensed under the MIT License.

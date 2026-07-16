@@ -19,7 +19,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,6 +27,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.Vedang.careerflow.ui.components.JobCard
+import com.Vedang.careerflow.ui.components.BackNavigationButton
 import com.Vedang.careerflow.viewmodel.SearchUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,9 +45,7 @@ fun SearchScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Find jobs", style = MaterialTheme.typography.titleLarge) },
-                navigationIcon = {
-                    TextButton(onClick = onBack) { Text("Back") }
-                }
+                navigationIcon = { BackNavigationButton(onClick = onBack) }
             )
         }
     ) { innerPadding ->

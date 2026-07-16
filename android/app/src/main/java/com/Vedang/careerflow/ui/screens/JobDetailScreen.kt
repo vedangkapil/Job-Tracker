@@ -19,7 +19,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.Vedang.careerflow.model.Job
 import com.Vedang.careerflow.ui.components.ErrorContent
 import com.Vedang.careerflow.ui.components.LoadingContent
+import com.Vedang.careerflow.ui.components.BackNavigationButton
 import com.Vedang.careerflow.viewmodel.JobDetailUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +43,7 @@ fun JobDetailScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Job details", style = MaterialTheme.typography.titleLarge) },
-                navigationIcon = { TextButton(onClick = onBack) { Text("Back") } }
+                navigationIcon = { BackNavigationButton(onClick = onBack) }
             )
         }
     ) { innerPadding ->

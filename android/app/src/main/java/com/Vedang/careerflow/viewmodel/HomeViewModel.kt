@@ -26,7 +26,9 @@ class HomeViewModel(
     fun loadJobs() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            when (val result = repository.getJobs()) {
+            // The home feed contains the current search only. Jobs the user
+            // saved are deliberately kept in the separate Saved jobs screen.
+            when (val result = repository.getUntrackedJobs()) {
                 is AppResult.Success -> _uiState.update {
                     it.copy(isLoading = false, jobs = result.data)
                 }

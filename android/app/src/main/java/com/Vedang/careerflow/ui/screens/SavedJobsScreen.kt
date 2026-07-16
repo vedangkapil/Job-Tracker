@@ -9,9 +9,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,6 +20,7 @@ import com.Vedang.careerflow.ui.components.EmptyContent
 import com.Vedang.careerflow.ui.components.ErrorContent
 import com.Vedang.careerflow.ui.components.JobCard
 import com.Vedang.careerflow.ui.components.LoadingContent
+import com.Vedang.careerflow.ui.components.BackNavigationButton
 import com.Vedang.careerflow.viewmodel.SavedJobsUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,8 +36,8 @@ fun SavedJobsScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Saved jobs", style = MaterialTheme.typography.titleLarge) },
-                navigationIcon = { TextButton(onClick = onBack) { Text("Back") } },
-                actions = { TextButton(onClick = onRefresh) { Text("Refresh") } }
+                navigationIcon = { BackNavigationButton(onClick = onBack) },
+                actions = { OutlinedButton(onClick = onRefresh) { Text("Refresh") } }
             )
         }
     ) { innerPadding ->

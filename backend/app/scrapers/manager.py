@@ -42,6 +42,19 @@ class ScraperManager:
         ).all()
         for job in legacy_jobs:
             session.delete(job)
+
+    @staticmethod
+    def _remove_previous_search_results(session: Session) -> None:
+        """Keep the discovery feed scoped to the most recent search.
+
+        Tracked jobs are a user's shortlist, so they are deliberately retained
+        and continue to appear on the Saved jobs screen.
+        """
+        previous_results = session.exec(
+            select(Job).where(Job.is_tracked == False)
+        ).all()
+        for job in previous_results:
+            session.delete(job)
     
     async def scrape_all_sources(self, keyword: str, location: str, sources: List[str] = None) -> List[Dict]:
         """Scrape jobs from multiple sources."""
@@ -75,9 +88,10 @@ class ScraperManager:
             raise ValueError("A database session is required to save scraped jobs")
 
         try:
-            # The old application stored eight fixed demo jobs for every query.
-            # Clear those invalid rows even if this real search returns no jobs.
+            # A new search replaces the discovery feed. Keep explicitly saved
+            # roles, which are shown separately in the Saved jobs screen.
             self._remove_legacy_demo_jobs(session)
+            self._remove_previous_search_results(session)
             for job_data in scraped_jobs:
                 # Check if job already exists
                 existing_job = session.exec(

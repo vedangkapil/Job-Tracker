@@ -18,6 +18,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,6 +32,7 @@ import com.Vedang.careerflow.ui.components.EmptyContent
 import com.Vedang.careerflow.ui.components.ErrorContent
 import com.Vedang.careerflow.ui.components.JobCard
 import com.Vedang.careerflow.ui.components.LoadingContent
+import com.Vedang.careerflow.ui.components.BrandLockup
 import com.Vedang.careerflow.viewmodel.HomeUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,13 +48,10 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "CareerFlow",
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                    BrandLockup()
                 },
                 actions = {
-                    TextButton(onClick = onSavedJobs) {
+                    OutlinedButton(onClick = onSavedJobs) {
                         Text("Saved jobs")
                     }
                 }
@@ -112,9 +111,9 @@ private fun JobList(
         }
         item {
             Column {
-                Text("All discovered opportunities", style = MaterialTheme.typography.headlineMedium)
+                Text("Latest search results", style = MaterialTheme.typography.headlineMedium)
                 Text(
-                    text = "${uiState.jobs.size} roles currently saved in your collection",
+                    text = "${uiState.jobs.size} opportunities from your latest search",
                     modifier = Modifier.padding(top = 4.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
